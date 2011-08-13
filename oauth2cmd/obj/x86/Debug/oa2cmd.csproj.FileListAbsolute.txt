@@ -1,0 +1,10 @@
+C:\home\takekazu\project\github\takekazuomi\oauth2cmd\oa2cmd\oa2cmd\bin\Debug\oa2cmd.exe.config
+C:\home\takekazu\project\github\takekazuomi\oauth2cmd\oa2cmd\oa2cmd\bin\Debug\oa2cmd.exe
+C:\home\takekazu\project\github\takekazuomi\oauth2cmd\oa2cmd\oa2cmd\bin\Debug\oa2cmd.pdb
+C:\home\takekazu\project\github\takekazuomi\oauth2cmd\oa2cmd\oa2cmd\bin\Debug\HttpMachine.dll
+C:\home\takekazu\project\github\takekazuomi\oauth2cmd\oa2cmd\oa2cmd\bin\Debug\Kayak.dll
+C:\home\takekazu\project\github\takekazuomi\oauth2cmd\oa2cmd\oa2cmd\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\home\takekazu\project\github\takekazuomi\oauth2cmd\oa2cmd\oa2cmd\obj\x86\Debug\oa2cmd.exe
+C:\home\takekazu\project\github\takekazuomi\oauth2cmd\oa2cmd\oa2cmd\obj\x86\Debug\oa2cmd.pdb
+C:\home\takekazu\project\github\takekazuomi\oauth2cmd\oa2cmd\oa2cmd\bin\Debug\Kayak.pdb
+C:\home\takekazu\project\github\takekazuomi\oauth2cmd\oa2cmd\oa2cmd\bin\Debug\Kayak.xml
