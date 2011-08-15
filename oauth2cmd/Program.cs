@@ -7,6 +7,9 @@ using System.Text;
 using Kayak;
 using Kayak.Http;
 using System.Web;
+using System.Collections.Concurrent;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace oauth2cmd
 {
@@ -72,17 +75,28 @@ namespace oauth2cmd
                 
             OpenBrowser(url);
 
+
             var scheduler = KayakScheduler.Factory.Create(new SchedulerDelegate());
+            var ato = new AccessTokenObserver(scheduler);
+
             scheduler.Post(() =>
             {
+                var reqD = new RequestDelegate();
+                ato.Subscribe(reqD);
+                
                 KayakServer.Factory
-                    .CreateHttp(new RequestDelegate(), scheduler)
+                    .CreateHttp(reqD, scheduler)
                     .Listen(new IPEndPoint(IPAddress.Loopback, 8080));
             });
 
-            // runs scheduler on calling thread. this method will block until
-            // someone calls Stop() on the scheduler.
-            scheduler.Start();
+            var kayak = Task.Factory.StartNew(() =>
+            {
+                scheduler.Start();
+            });
+
+            Debug.WriteLine(ato.AccessToken);
+
+            kayak.Wait();
         }
 
 
@@ -121,9 +135,14 @@ namespace oauth2cmd
             }
         }
 
-        class RequestDelegate : IHttpRequestDelegate
+
+        class RequestDelegate : IHttpRequestDelegate, IObservable<string>
         {
-            string Get(string uri) {
+            List<IObserver<string>> observers = new List<IObserver<string>>();
+            ReaderWriterLockSlim olock = new ReaderWriterLockSlim();
+
+            string Get(string uri)
+            {
                 var client = new WebClient();
                 return client.DownloadString(uri);
             }
@@ -158,6 +177,7 @@ namespace oauth2cmd
                         var result2 = HttpUtility.ParseQueryString(result);
                         AccessToken = result2["access_token"];
 
+
                         message = "You have successfully logged in to facebook. token=" + AccessToken;
                         Debug.WriteLine(message);
 
@@ -176,6 +196,8 @@ namespace oauth2cmd
                     };
 
                     response.OnResponse(headers, body);
+
+                    OnAuthorization(AccessToken);
                 }
                 else
                 {
@@ -195,7 +217,128 @@ namespace oauth2cmd
                     response.OnResponse(headers, body);
                 }
             }
+
+            public IDisposable Subscribe(IObserver<string> observer)
+            {
+                olock.EnterUpgradeableReadLock();
+                try
+                {
+                    if (!observers.Contains(observer))
+                    {
+                        olock.EnterWriteLock();
+                        try
+                        {
+                            observers.Add(observer);
+                        }
+                        finally {
+                            olock.ExitWriteLock();
+                        }
+                    }
+                }
+                finally {
+                    olock.ExitUpgradeableReadLock();
+                }
+                return new Unsubscriber(this, observer);
+            }
+
+            private void UnSubscribe(IObserver<string> observer)
+            {
+                olock.EnterUpgradeableReadLock();
+                try
+                {
+                    if (!observers.Contains(observer))
+                    {
+                        olock.EnterWriteLock();
+                        try
+                        {
+                            observers.Remove(observer);
+                        }
+                        finally
+                        {
+                            olock.ExitWriteLock();
+                        }
+                    }
+                }
+                finally
+                {
+                    olock.ExitUpgradeableReadLock();
+                }
+            }
+
+            public void OnAuthorization(string accesToken)
+            {
+                foreach (var observer in observers)
+                {
+                    if (accesToken == null)
+                        observer.OnError(new Exception("OAuth error"));
+                    else
+                        observer.OnNext(accesToken);
+                }
+            }
+
+            private class Unsubscriber : IDisposable
+            {
+                RequestDelegate observers;
+                IObserver<string> observer;
+
+                public Unsubscriber(RequestDelegate observers, IObserver<string> observer)
+                {
+                    this.observers = observers;
+                    this.observer = observer;
+                }
+
+                public void Dispose()
+                {
+                    if (observer != null) {
+                        observers.UnSubscribe(observer);
+                    }
+                }
+            }
+
         }
+
+        public class AccessTokenObserver : IObserver<string>
+        {
+            private IDisposable unsubscriber;
+            private IScheduler scheduler;
+            public string AccessToken { set;get;}
+
+            public AccessTokenObserver(IScheduler scheduler)
+            {
+                this.scheduler = scheduler;
+            }
+
+            public virtual void Subscribe(IObservable<string> provider)
+            {
+                if (provider != null)
+                    unsubscriber = provider.Subscribe(this);
+            }
+
+            public virtual void OnCompleted()
+            {
+                Console.WriteLine("OnCompleted");
+                this.Unsubscribe();
+            }
+
+            public virtual void OnError(Exception e)
+            {
+                Console.WriteLine(e.Message);
+            }
+
+            public virtual void OnNext(string value)
+            {
+                Console.WriteLine(value);
+                AccessToken = value;
+            }
+
+            public virtual void Unsubscribe()
+            {
+                unsubscriber.Dispose();
+            }
+
+
+        }
+
 
         class BufferedProducer : IDataProducer
         {
