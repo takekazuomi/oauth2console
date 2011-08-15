@@ -1,0 +1,11 @@
+obj
+bin
+temp
+tmp
+.DS_Store
+*~
+*.suo
+*.user
+*.build.csdef
+Bin
+ClientBin
