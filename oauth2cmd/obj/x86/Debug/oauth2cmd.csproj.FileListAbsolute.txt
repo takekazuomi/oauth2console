@@ -1,8 +1,0 @@
-C:\home\takekazu\project\oauth2cmd\oauth2cmd\bin\Debug\oauth2cmd.exe.config
-C:\home\takekazu\project\oauth2cmd\oauth2cmd\obj\x86\Debug\ResolveAssemblyReference.cache
-C:\home\takekazu\project\oauth2cmd\oauth2cmd\bin\Debug\oauth2cmd.exe
-C:\home\takekazu\project\oauth2cmd\oauth2cmd\bin\Debug\oauth2cmd.pdb
-C:\home\takekazu\project\oauth2cmd\oauth2cmd\bin\Debug\HttpMachine.dll
-C:\home\takekazu\project\oauth2cmd\oauth2cmd\bin\Debug\Kayak.dll
-C:\home\takekazu\project\oauth2cmd\oauth2cmd\obj\x86\Debug\oauth2cmd.exe
-C:\home\takekazu\project\oauth2cmd\oauth2cmd\obj\x86\Debug\oauth2cmd.pdb
