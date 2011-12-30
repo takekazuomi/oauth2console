@@ -15,8 +15,8 @@ namespace oauth2cmd
 {
     class Program
     {
-        static readonly string APP_ID = "241855485843490";
-        static readonly string APP_SECRET = "7116b8d09037d005b1cfb33833112fc0";
+        static readonly string APP_ID = "USE YOUR APP ID";
+        static readonly string APP_SECRET = "USE YOUR APP SECTEC";
         static readonly string ENDPOINT = "https://graph.facebook.com";
         static readonly string REDIRECT_URI = "http://localhost:8080/";
         static string AccessToken;
